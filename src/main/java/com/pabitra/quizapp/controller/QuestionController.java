@@ -33,14 +33,14 @@ public class QuestionController {
 
     // Get all the question based on the difficulty level
     @GetMapping("/difficulty/{difficultyLevel}")
-    public List<Question> getByDifficulty(@PathVariable String difficultyLevel) {
+    public ResponseEntity<List<Question>> getByDifficulty(@PathVariable String difficultyLevel) {
         return questionService.getQuestionsByDifficulty(difficultyLevel);
     }
 
 
     // Get Question based on the difficulty and category
     @GetMapping("/difficulty/{difficultyLevel}/category/{category}")
-    public List<Question> getByDifficultyAndCategory(@PathVariable String difficultyLevel, @PathVariable String category){
+    public ResponseEntity<List<Question>> getByDifficultyAndCategory(@PathVariable String difficultyLevel, @PathVariable String category){
         return questionService.getQuestionByDifficultyAndCategory(difficultyLevel, category);
     }
 
@@ -54,14 +54,14 @@ public class QuestionController {
 
     // Update the question into the database
     @PutMapping("/update/{id}")
-    public Question updateQuestion(@PathVariable long id, @Valid @RequestBody Question question){
+    public ResponseEntity<?> updateQuestion(@PathVariable long id, @Valid @RequestBody Question question){
         return questionService.saveUpdateQuestion(id, question);
     }
 
 
     // Delete the question to the database
     @DeleteMapping("/delete/{id}")
-    public String deleteQuestion(@PathVariable long id){
+    public ResponseEntity<?> deleteQuestion(@PathVariable long id){
         return questionService.deleteQuestion(id);
     }
 }

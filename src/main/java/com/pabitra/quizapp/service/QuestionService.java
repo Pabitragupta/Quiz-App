@@ -41,14 +41,24 @@ public class QuestionService {
 
 
     // Get Question based on Difficult of that question
-    public List<Question> getQuestionsByDifficulty(String difficultyLevel) {
-        return questionRepository.findByDifficultyLevel(difficultyLevel);
+    public ResponseEntity<List<Question>> getQuestionsByDifficulty(String difficultyLevel) {
+        try {
+            return new ResponseEntity<>(questionRepository.findByDifficultyLevel(difficultyLevel), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
     }
 
 
     // Get Question based on the difficulty and category
-    public List<Question> getQuestionByDifficultyAndCategory(String difficultyLevel, String category){
-        return questionRepository.findByDifficultyLevelAndCategory(difficultyLevel, category);
+    public ResponseEntity<List<Question>> getQuestionByDifficultyAndCategory(String difficultyLevel, String category){
+        try {
+            return new ResponseEntity<>(questionRepository.findByDifficultyLevelAndCategory(difficultyLevel, category), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
     }
 
 
@@ -59,32 +69,42 @@ public class QuestionService {
 
 
     // Update Question into the database
-    public Question saveUpdateQuestion(long id, Question updatedQuestion) {
+    public ResponseEntity<?> saveUpdateQuestion(long id, Question updatedQuestion) {
+        try {
+            Question existingQuestion = questionRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
 
-        Question existingQuestion = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
-
-        existingQuestion.setQuestionTitle(updatedQuestion.getQuestionTitle());
-        existingQuestion.setOption1(updatedQuestion.getOption1());
-        existingQuestion.setOption2(updatedQuestion.getOption2());
-        existingQuestion.setOption3(updatedQuestion.getOption3());
-        existingQuestion.setOption4(updatedQuestion.getOption4());
-        existingQuestion.setRightAnswer(updatedQuestion.getRightAnswer());
-        existingQuestion.setDifficultyLevel(updatedQuestion.getDifficultyLevel());
-        existingQuestion.setCategory(updatedQuestion.getCategory());
+            existingQuestion.setQuestionTitle(updatedQuestion.getQuestionTitle());
+            existingQuestion.setOption1(updatedQuestion.getOption1());
+            existingQuestion.setOption2(updatedQuestion.getOption2());
+            existingQuestion.setOption3(updatedQuestion.getOption3());
+            existingQuestion.setOption4(updatedQuestion.getOption4());
+            existingQuestion.setRightAnswer(updatedQuestion.getRightAnswer());
+            existingQuestion.setDifficultyLevel(updatedQuestion.getDifficultyLevel());
+            existingQuestion.setCategory(updatedQuestion.getCategory());
 
 
-        return questionRepository.save(existingQuestion);
+            return new ResponseEntity<>(questionRepository.save(existingQuestion), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
     // Delete the question to the database
     @Transactional
-    public String deleteQuestion(long id) {
-        Question existingQuestion = questionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
+    public ResponseEntity<?> deleteQuestion(long id) {
+        try {
+            Question existingQuestion = questionRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
 
-        questionRepository.delete(existingQuestion);
-        return "Question with id " + id + " has been deleted successfully.";
+            questionRepository.delete(existingQuestion);
+            return new ResponseEntity<>("Question with id " + id + " has been deleted successfully.", HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
