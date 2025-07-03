@@ -1,4 +1,4 @@
-package com.pabitra.quizapp.controller;
+package com.pabitra.quizapp.controller.admin;
 
 import com.pabitra.quizapp.entity.Question;
 import com.pabitra.quizapp.service.QuestionService;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/question")
+@RequestMapping("/admin")
 public class QuestionController {
 
     @Autowired

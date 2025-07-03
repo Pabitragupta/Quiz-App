@@ -1,4 +1,4 @@
-package com.pabitra.quizapp.controller;
+package com.pabitra.quizapp.controller.user;
 
 
 import com.pabitra.quizapp.entity.QuestionWrapper;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/quiz")
+@RequestMapping("/user")
 public class QuizController {
 
     @Autowired
