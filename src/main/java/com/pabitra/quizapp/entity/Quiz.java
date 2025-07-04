@@ -23,6 +23,10 @@ public class Quiz {
     @ManyToMany
     private List<Question> questions;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User createdBy;
+
     public long getId() {
         return id;
     }
@@ -45,5 +49,13 @@ public class Quiz {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }
