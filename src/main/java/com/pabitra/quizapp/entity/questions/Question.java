@@ -1,9 +1,7 @@
-package com.pabitra.quizapp.entity;
+package com.pabitra.quizapp.entity.questions;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.pabitra.quizapp.entity.User;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,6 +40,10 @@ public class Question {
 
     @NotBlank(message = "Category cannot be blank")
     private String category;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
 
 
 
@@ -115,5 +117,13 @@ public class Question {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }

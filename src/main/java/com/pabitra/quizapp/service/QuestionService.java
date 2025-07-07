@@ -1,11 +1,17 @@
 package com.pabitra.quizapp.service;
 
-import com.pabitra.quizapp.entity.Question;
+import com.pabitra.quizapp.entity.questions.Question;
+import com.pabitra.quizapp.entity.User;
+import com.pabitra.quizapp.entity.questions.QuestionWrapper;
+import com.pabitra.quizapp.entity.questions.QuestionsSeen;
 import com.pabitra.quizapp.repository.QuestionRepository;
+import com.pabitra.quizapp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,11 +23,40 @@ public class QuestionService {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
-    // Get all question
-    public ResponseEntity<List<Question>> getAllQuestion(){
+
+    // Get all question based on the login user
+    public ResponseEntity<List<QuestionsSeen>> getAllQuestion(){
         try {
-            return new ResponseEntity<>(questionRepository.findAll(), HttpStatus.OK);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            if(email == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            List<Question> questionsFromDB = questionRepository.findByCreatedByEmail(email);
+            List<QuestionsSeen> questions = new ArrayList<>();
+
+
+            for (Question q : questionsFromDB) {
+                QuestionsSeen qw = new QuestionsSeen(
+                        q.getId(),
+                        q.getQuestionTitle(),
+                        q.getOption1(),
+                        q.getOption2(),
+                        q.getOption3(),
+                        q.getOption4(),
+                        q.getRightAnswer(),
+                        q.getDifficultyLevel(),
+                        q.getCategory()
+                );
+                questions.add(qw);
+            }
+
+            return new ResponseEntity<>(questions, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -64,7 +99,24 @@ public class QuestionService {
 
     // Add question to the database
     public ResponseEntity<Question> saveQuestion(Question question) {
-        return new ResponseEntity<>(questionRepository.save(question), HttpStatus.CREATED);
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            User user = userRepository.findByEmail(email);
+
+            if(user == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            question.setCreatedBy(user);
+            questionRepository.save(question);
+
+            return new ResponseEntity<>(question, HttpStatus.CREATED);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 

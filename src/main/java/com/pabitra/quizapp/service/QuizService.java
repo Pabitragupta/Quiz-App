@@ -1,6 +1,8 @@
 package com.pabitra.quizapp.service;
 
 import com.pabitra.quizapp.entity.*;
+import com.pabitra.quizapp.entity.questions.Question;
+import com.pabitra.quizapp.entity.questions.QuestionWrapper;
 import com.pabitra.quizapp.repository.QuestionRepository;
 import com.pabitra.quizapp.repository.QuizRepository;
 import com.pabitra.quizapp.repository.UserRepository;
@@ -111,21 +113,42 @@ public class QuizService {
     // Used to calculate the result
     public ResponseEntity<?> calculateResult(long id, List<Response> responses) {
         try {
-            Optional<Quiz> quiz = quizRepository.findById(id);
-            List<Question> questions = quiz.get().getQuestions();
+            Optional<Quiz> quizOptional = quizRepository.findById(id);
+            if (quizOptional.isEmpty()) {
+                return new ResponseEntity<>("This quiz id is not present.", HttpStatus.NOT_FOUND);
+            }
+
+            Quiz quiz = quizOptional.get();
+
+            // Check if the current user is the creator
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName(); // Email from JWT or login
+
+            if (!quiz.getCreatedBy().getEmail().equals(email)) {
+                return new ResponseEntity<>("You are not the wonner of this quiz", HttpStatus.FORBIDDEN); // Not the owner
+            }
+
+
+            List<Question> questions = quiz.getQuestions();
+            int len = questions.size();
             int right = 0;
+            int wrong = 0;
             int ind = 0;
             for(Response response : responses){
                 if(response.getResponse().equals(questions.get(ind).getRightAnswer())){
                     right++;
                 }
+                else {
+                    wrong++;
+                }
                 ind++;
             }
 
-            return new ResponseEntity<>(right, HttpStatus.OK);
+            return new ResponseEntity<>("Correct = " + right + " Wrong = " + wrong +
+                    " Total Score " + right + " out of " + len, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

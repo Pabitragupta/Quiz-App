@@ -1,10 +1,9 @@
-package com.pabitra.quizapp.entity;
+package com.pabitra.quizapp.entity.questions;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Data
-@NoArgsConstructor
 public class QuestionWrapper {
 
     private Long id;
