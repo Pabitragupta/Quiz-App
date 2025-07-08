@@ -1,8 +1,8 @@
 package com.pabitra.quizapp.service;
 
 import com.pabitra.quizapp.entity.*;
-import com.pabitra.quizapp.entity.questions.Question;
-import com.pabitra.quizapp.entity.questions.QuestionWrapper;
+import com.pabitra.quizapp.entity.Question;
+import com.pabitra.quizapp.response.QuestionWrapper;
 import com.pabitra.quizapp.repository.QuestionRepository;
 import com.pabitra.quizapp.repository.QuizRepository;
 import com.pabitra.quizapp.repository.UserRepository;

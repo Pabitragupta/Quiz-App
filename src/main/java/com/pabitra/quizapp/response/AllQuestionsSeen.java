@@ -1,9 +1,9 @@
-package com.pabitra.quizapp.entity.questions;
+package com.pabitra.quizapp.response;
 
 import lombok.Data;
 
 @Data
-public class QuestionsSeen {
+public class AllQuestionsSeen {
 
 
     private Long id;
@@ -16,11 +16,11 @@ public class QuestionsSeen {
     private String difficultyLevel;
     private String category;
 
-    public QuestionsSeen() {} // Default constructor
+    public AllQuestionsSeen() {} // Default constructor
 
-    public QuestionsSeen(Long id, String questionTitle, String option1,
-                           String option2, String option3, String option4,
-                           String rightAnswer, String difficultyLevel, String category) {
+    public AllQuestionsSeen(Long id, String questionTitle, String option1,
+                            String option2, String option3, String option4,
+                            String rightAnswer, String difficultyLevel, String category) {
         this.id = id;
         this.questionTitle = questionTitle;
         this.option1 = option1;

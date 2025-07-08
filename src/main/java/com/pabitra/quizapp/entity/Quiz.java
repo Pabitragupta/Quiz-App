@@ -1,6 +1,5 @@
 package com.pabitra.quizapp.entity;
 
-import com.pabitra.quizapp.entity.questions.Question;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

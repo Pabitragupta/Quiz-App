@@ -1,7 +1,8 @@
 package com.pabitra.quizapp.controller.admin;
 
-import com.pabitra.quizapp.entity.questions.Question;
-import com.pabitra.quizapp.entity.questions.QuestionsSeen;
+import com.pabitra.quizapp.entity.Question;
+import com.pabitra.quizapp.response.AllQuestionsSeen;
+import com.pabitra.quizapp.response.QuestionsBasedOnTheCategory;
 import com.pabitra.quizapp.service.QuestionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,14 @@ public class QuestionController {
 
     // Get all the question based on the login user
     @GetMapping("/all-question")
-    public ResponseEntity<List<QuestionsSeen>> getAllQuestion() {
+    public ResponseEntity<List<AllQuestionsSeen>> getAllQuestion() {
         return questionService.getAllQuestion();
     }
 
 
     // Get all the question base on the category
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<Question>> getByCategory(@PathVariable String category) {
+    public ResponseEntity<List<QuestionsBasedOnTheCategory>> getByCategory(@PathVariable String category) {
         return questionService.getQuestionsByCategory(category);
     }
 

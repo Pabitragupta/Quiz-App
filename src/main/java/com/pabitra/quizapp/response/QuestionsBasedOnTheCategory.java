@@ -1,28 +1,36 @@
-package com.pabitra.quizapp.entity.questions;
+package com.pabitra.quizapp.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 
 @Data
-public class QuestionWrapper {
-
+@AllArgsConstructor
+public class QuestionsBasedOnTheCategory {
     private Long id;
     private String questionTitle;
     private String option1;
     private String option2;
     private String option3;
     private String option4;
+    private String rightAnswer;
+    private String difficultyLevel;
 
-    public QuestionWrapper() {} // Default constructor
 
-    public QuestionWrapper(Long id, String questionTitle, String option1, String option2, String option3, String option4) {
+
+    public QuestionsBasedOnTheCategory(Long id, String questionTitle, String option1,
+                                       String option2, String option3, String option4,
+                                       String rightAnswer, String difficultyLevel) {
         this.id = id;
         this.questionTitle = questionTitle;
         this.option1 = option1;
         this.option2 = option2;
         this.option3 = option3;
         this.option4 = option4;
+        this.rightAnswer = rightAnswer;
+        this.difficultyLevel = difficultyLevel;
     }
+
 
     public Long getId() {
         return id;
@@ -64,11 +72,27 @@ public class QuestionWrapper {
         this.option3 = option3;
     }
 
+    public String getRightAnswer() {
+        return rightAnswer;
+    }
+
+    public void setRightAnswer(String rightAnswer) {
+        this.rightAnswer = rightAnswer;
+    }
+
     public String getOption4() {
         return option4;
     }
 
     public void setOption4(String option4) {
         this.option4 = option4;
+    }
+
+    public String getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(String difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 }

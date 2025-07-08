@@ -1,11 +1,11 @@
 package com.pabitra.quizapp.service;
 
-import com.pabitra.quizapp.entity.questions.Question;
+import com.pabitra.quizapp.entity.Question;
 import com.pabitra.quizapp.entity.User;
-import com.pabitra.quizapp.entity.questions.QuestionWrapper;
-import com.pabitra.quizapp.entity.questions.QuestionsSeen;
+import com.pabitra.quizapp.response.AllQuestionsSeen;
 import com.pabitra.quizapp.repository.QuestionRepository;
 import com.pabitra.quizapp.repository.UserRepository;
+import com.pabitra.quizapp.response.QuestionsBasedOnTheCategory;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -28,7 +29,7 @@ public class QuestionService {
 
 
     // Get all question based on the login user
-    public ResponseEntity<List<QuestionsSeen>> getAllQuestion(){
+    public ResponseEntity<List<AllQuestionsSeen>> getAllQuestion(){
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
@@ -38,11 +39,11 @@ public class QuestionService {
             }
 
             List<Question> questionsFromDB = questionRepository.findByCreatedByEmail(email);
-            List<QuestionsSeen> questions = new ArrayList<>();
+            List<AllQuestionsSeen> questions = new ArrayList<>();
 
 
             for (Question q : questionsFromDB) {
-                QuestionsSeen qw = new QuestionsSeen(
+                AllQuestionsSeen qw = new AllQuestionsSeen(
                         q.getId(),
                         q.getQuestionTitle(),
                         q.getOption1(),
@@ -59,20 +60,53 @@ public class QuestionService {
             return new ResponseEntity<>(questions, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
     }
 
 
     // Get question based on category
-    public ResponseEntity<List<Question>> getQuestionsByCategory(String category) {
+    public ResponseEntity<List<QuestionsBasedOnTheCategory>> getQuestionsByCategory(String category) {
         try {
-            return new ResponseEntity<>(questionRepository.findByCategory(category), HttpStatus.OK);
-        } catch (Exception e){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            if (email == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // Convert email to User
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+//            User user = userOpt.get();
+
+            // Now use user instead of email
+            List<Question> questionsFromDB = questionRepository.findByCategoryAndCreatedBy(category, user);
+            List<QuestionsBasedOnTheCategory> questions = new ArrayList<>();
+
+            for (Question q : questionsFromDB) {
+                QuestionsBasedOnTheCategory qw = new QuestionsBasedOnTheCategory(
+                        q.getId(),
+                        q.getQuestionTitle(),
+                        q.getOption1(),
+                        q.getOption2(),
+                        q.getOption3(),
+                        q.getOption4(),
+                        q.getRightAnswer(),
+                        q.getDifficultyLevel()
+                );
+                questions.add(qw);
+            }
+
+            return new ResponseEntity<>(questions, HttpStatus.OK);
+        } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
     }
+
 
 
     // Get Question based on Difficult of that question

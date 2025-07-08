@@ -1,7 +1,7 @@
 package com.pabitra.quizapp.controller.user;
 
 
-import com.pabitra.quizapp.entity.questions.QuestionWrapper;
+import com.pabitra.quizapp.response.QuestionWrapper;
 import com.pabitra.quizapp.entity.Response;
 import com.pabitra.quizapp.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;

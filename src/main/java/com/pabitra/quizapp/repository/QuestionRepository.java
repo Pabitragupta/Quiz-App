@@ -1,7 +1,7 @@
 package com.pabitra.quizapp.repository;
 
-import com.pabitra.quizapp.entity.questions.Question;
-import com.pabitra.quizapp.entity.questions.QuestionsSeen;
+import com.pabitra.quizapp.entity.Question;
+import com.pabitra.quizapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,5 +18,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findRandomQuestionsByCategory(String category, int numQ);
 
     List<Question> findByCreatedByEmail(String email);
+
+    List<Question> findByCategoryAndCreatedBy(String category, User createdBy);
 }
 

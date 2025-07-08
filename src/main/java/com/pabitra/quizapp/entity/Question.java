@@ -1,6 +1,5 @@
-package com.pabitra.quizapp.entity.questions;
+package com.pabitra.quizapp.entity;
 
-import com.pabitra.quizapp.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
