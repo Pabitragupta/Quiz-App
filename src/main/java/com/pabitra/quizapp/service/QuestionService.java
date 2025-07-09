@@ -6,6 +6,7 @@ import com.pabitra.quizapp.response.AllQuestionsSeen;
 import com.pabitra.quizapp.repository.QuestionRepository;
 import com.pabitra.quizapp.repository.UserRepository;
 import com.pabitra.quizapp.response.QuestionsBasedOnTheCategory;
+import com.pabitra.quizapp.response.QuestionsBasedOnTheDifficulty;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -110,13 +111,43 @@ public class QuestionService {
 
 
     // Get Question based on Difficult of that question
-    public ResponseEntity<List<Question>> getQuestionsByDifficulty(String difficultyLevel) {
+    public ResponseEntity<List<QuestionsBasedOnTheDifficulty>> getQuestionsByDifficulty(String difficultyLevel) {
         try {
-            return new ResponseEntity<>(questionRepository.findByDifficultyLevel(difficultyLevel), HttpStatus.OK);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            if(email == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            User user = userRepository.findByEmail(email);
+            if(user == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            List<Question> questionFromDB = questionRepository.findByDifficultyLevelAndCreatedBy(difficultyLevel, user);
+            List<QuestionsBasedOnTheDifficulty> questions = new ArrayList<>();
+
+            for(Question q : questionFromDB){
+                QuestionsBasedOnTheDifficulty qw = new QuestionsBasedOnTheDifficulty(
+                        q.getId(),
+                        q.getQuestionTitle(),
+                        q.getOption1(),
+                        q.getOption2(),
+                        q.getOption3(),
+                        q.getOption4(),
+                        q.getRightAnswer(),
+                        q.getCategory()
+                );
+                questions.add(qw);
+            }
+
+            return new ResponseEntity<>(questions, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+
     }
 
 
@@ -157,8 +188,21 @@ public class QuestionService {
     // Update Question into the database
     public ResponseEntity<?> saveUpdateQuestion(long id, Question updatedQuestion) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            if(email == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            //fetch the user details using createdBy
             Question existingQuestion = questionRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
+
+            if(!existingQuestion.getCreatedBy().getEmail().equals(email)){
+                return new ResponseEntity<>("You are not the won this question", HttpStatus.BAD_REQUEST);
+            }
+
 
             existingQuestion.setQuestionTitle(updatedQuestion.getQuestionTitle());
             existingQuestion.setOption1(updatedQuestion.getOption1());
@@ -173,9 +217,8 @@ public class QuestionService {
             return new ResponseEntity<>(questionRepository.save(existingQuestion), HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
-
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -183,8 +226,20 @@ public class QuestionService {
     @Transactional
     public ResponseEntity<?> deleteQuestion(long id) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            if(email == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+
             Question existingQuestion = questionRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
+
+            if(!existingQuestion.getCreatedBy().getEmail().equals(email)){
+                return new ResponseEntity<>("You are not won this question.", HttpStatus.NOT_FOUND);
+            }
 
             questionRepository.delete(existingQuestion);
             return new ResponseEntity<>("Question with id " + id + " has been deleted successfully.", HttpStatus.OK);

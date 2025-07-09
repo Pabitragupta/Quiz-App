@@ -20,5 +20,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByCreatedByEmail(String email);
 
     List<Question> findByCategoryAndCreatedBy(String category, User createdBy);
+
+    List<Question> findByDifficultyLevelAndCreatedBy(String difficultyLevel, User createdBy);
 }
 

@@ -3,6 +3,7 @@ package com.pabitra.quizapp.controller.admin;
 import com.pabitra.quizapp.entity.Question;
 import com.pabitra.quizapp.response.AllQuestionsSeen;
 import com.pabitra.quizapp.response.QuestionsBasedOnTheCategory;
+import com.pabitra.quizapp.response.QuestionsBasedOnTheDifficulty;
 import com.pabitra.quizapp.service.QuestionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class QuestionController {
 
     // Get all the question based on the difficulty level
     @GetMapping("/difficulty/{difficultyLevel}")
-    public ResponseEntity<List<Question>> getByDifficulty(@PathVariable String difficultyLevel) {
+    public ResponseEntity<List<QuestionsBasedOnTheDifficulty>> getByDifficulty(@PathVariable String difficultyLevel) {
         return questionService.getQuestionsByDifficulty(difficultyLevel);
     }
 

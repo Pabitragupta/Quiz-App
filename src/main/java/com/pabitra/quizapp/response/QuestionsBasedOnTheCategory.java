@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 public class QuestionsBasedOnTheCategory {
     private Long id;
     private String questionTitle;
