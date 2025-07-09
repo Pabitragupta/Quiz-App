@@ -20,7 +20,12 @@ public class Quiz {
     @NonNull
     private String title;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "quiz_questions",
+            joinColumns = @JoinColumn(name = "quiz_id"),
+            inverseJoinColumns = @JoinColumn(name = "questions_id")
+    )
     private List<Question> questions;
 
     @ManyToOne

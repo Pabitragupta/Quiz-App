@@ -1,7 +1,9 @@
 package com.pabitra.quizapp.service;
 
 import com.pabitra.quizapp.entity.Question;
+import com.pabitra.quizapp.entity.Quiz;
 import com.pabitra.quizapp.entity.User;
+import com.pabitra.quizapp.repository.QuizRepository;
 import com.pabitra.quizapp.response.AllQuestionsSeen;
 import com.pabitra.quizapp.repository.QuestionRepository;
 import com.pabitra.quizapp.repository.UserRepository;
@@ -27,6 +29,9 @@ public class QuestionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
 
     // Get all question based on the login user
@@ -229,23 +234,33 @@ public class QuestionService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
 
-            if(email == null){
+            if (email == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-
 
             Question existingQuestion = questionRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
 
-            if(!existingQuestion.getCreatedBy().getEmail().equals(email)){
-                return new ResponseEntity<>("You are not won this question.", HttpStatus.NOT_FOUND);
+            // Check if the authenticated user is the creator of the question
+            if (!existingQuestion.getCreatedBy().getEmail().equals(email)) {
+                return new ResponseEntity<>("You do not own this question.", HttpStatus.FORBIDDEN);
             }
 
+            // Remove this question from all quizzes
+            List<Quiz> quizzes = quizRepository.findByQuestionsContaining(existingQuestion);
+            for (Quiz quiz : quizzes) {
+                quiz.getQuestions().remove(existingQuestion);
+            }
+            quizRepository.saveAll(quizzes); // Persist the changes
+
+            // Now delete the question safely
             questionRepository.delete(existingQuestion);
+
             return new ResponseEntity<>("Question with id " + id + " has been deleted successfully.", HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>("Error deleting question: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
 }
