@@ -50,8 +50,8 @@ public class QuestionController {
 
     // Add the question to the database
     @PostMapping("/add")
-    public ResponseEntity<Question> addQuestion(@Valid @RequestBody Question question) {
-        return questionService.saveQuestion(question);
+    public ResponseEntity<List<Question>> addQuestion(@RequestBody List<Question> question) {
+        return questionService.saveAllQuestion(question);
     }
 
 

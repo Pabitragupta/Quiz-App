@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -168,7 +167,7 @@ public class QuestionService {
 
 
     // Add question to the database
-    public ResponseEntity<Question> saveQuestion(Question question) {
+    public ResponseEntity<List<Question>> saveAllQuestion(List<Question> questions) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
@@ -179,10 +178,13 @@ public class QuestionService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            question.setCreatedBy(user);
-            questionRepository.save(question);
+            for(Question q : questions){
+                q.setCreatedBy(user);
+            }
 
-            return new ResponseEntity<>(question, HttpStatus.CREATED);
+            List<Question> saveAllQuestions = questionRepository.saveAll(questions);
+
+            return new ResponseEntity<>(saveAllQuestions, HttpStatus.CREATED);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -14,13 +14,15 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByDifficultyLevel(String difficultyLevel);
     List<Question> findByDifficultyLevelAndCategory(String difficultyLevel, String category);
 
-    @Query(value = "SELECT * FROM question WHERE category = ?1 ORDER BY RAND() LIMIT ?2", nativeQuery = true)
+    @Query(value = "SELECT * " +
+            "FROM question " +
+            "WHERE category = ?1 " +
+            "ORDER BY RAND() " +
+            "LIMIT ?2", nativeQuery = true)
     List<Question> findRandomQuestionsByCategory(String category, int numQ);
 
     List<Question> findByCreatedByEmail(String email);
-
     List<Question> findByCategoryAndCreatedBy(String category, User createdBy);
-
     List<Question> findByDifficultyLevelAndCreatedBy(String difficultyLevel, User createdBy);
 }
 

@@ -46,6 +46,7 @@ public class QuizService {
     // Used to create the quiz
     public ResponseEntity<?> createQuiz(String category, int numQ, String title) {
         try {
+            //Check the user validity using the below methode.
             User currentUser = getCurrentUser();
 
             List<Question> questions = questionRepository.findRandomQuestionsByCategory(category, numQ);
